@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="HZK Mobile Info — simple, powerful device information.">
+<meta name="theme-color" content="#0d1117">
+<title>HZK Mobile Info</title>
+
+<style>
+:root{
+    --bg:#0d1117;
+    --surface:#161b22;
+    --surface2:#21262d;
+    --border:#30363d;
+    --text:#f0f6fc;
+    --muted:#8b949e;
+    --blue:#58a6ff;
+    --green:#3fb950;
+    --purple:#bc8cff;
+    --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+    margin:0;
+    color:var(--text);
+    background:var(--bg);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    overflow-x:hidden;
+}
+a{color:inherit}
+button{font:inherit}
+
+.noise{
+    position:fixed;
+    inset:0;
+    z-index:-5;
+    pointer-events:none;
+    opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.container{width:min(1120px,92%);margin:auto}
+
+/* NAV */
+
+nav{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid transparent;
+    transition:.35s;
+}
+nav.scrolled{
+    height:62px;
+    border-bottom-color:var(--border);
+    background:#0d1117dd;
+    backdrop-filter:blur(18px);
+}
+.brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    text-decoration:none;
+    font-weight:750;
+    letter-spacing:-.025em;
+}
+.brand-mark{
+    width:32px;height:32px;
+    display:grid;place-items:center;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--surface);
+    font-weight:900;
+    transition:.4s cubic-bezier(.2,.8,.2,1);
+}
+.brand:hover .brand-mark{
+    transform:rotate(-12deg) scale(1.12);
+    border-color:#58a6ff66;
+}
+.nav-links{display:flex;align-items:center;gap:25px}
+.nav-links a{
+    color:var(--muted);
+    text-decoration:none;
+    font-size:.88rem;
+    transition:.25s;
+}
+.nav-links a:hover{color:var(--text)}
+.github{
+    padding:8px 13px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--surface);
+}
+
+/* HERO */
+
+.hero{
+    min-height:calc(100vh - 72px);
+    display:grid;
+    place-items:center;
+    position:relative;
+    padding:100px 0 120px;
+}
+.hero-content{text-align:center;position:relative;z-index:2}
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--muted);
+    font-size:.78rem;
+    font-weight:650;
+}
+.eyebrow-dot{
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 13px #3fb95099;
+}
+h1{
+    max-width:1050px;
+    margin:25px auto;
+    font-size:clamp(4rem,11vw,9.5rem);
+    line-height:.82;
+    letter-spacing:-.095em;
+    font-weight:850;
+}
+.hero-title span{
+    display:inline-block;
+    background:linear-gradient(90deg,#f0f6fc,#58a6ff,#bc8cff);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:gradient 5s linear infinite;
+}
+.hero-copy{
+    max-width:600px;
+    margin:auto;
+    color:var(--muted);
+    line-height:1.7;
+    font-size:1.05rem;
+}
+.actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:30px;
+}
+.btn{
+    min-height:45px;
+    padding:0 18px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-decoration:none;
+    font-size:.88rem;
+    font-weight:650;
+    cursor:pointer;
+    transition:.25s cubic-bezier(.2,.8,.2,1);
+}
+.btn:hover{transform:translateY(-3px)}
+.btn-primary{
+    color:#fff;
+    background:#238636;
+    border-color:#2ea043;
+    box-shadow:0 8px 30px #23863622;
+}
+.btn-primary:hover{
+    background:#2ea043;
+    box-shadow:0 14px 40px #23863644;
+}
+.btn-secondary{background:var(--surface)}
+.btn-secondary:hover{border-color:#8b949e;background:var(--surface2)}
+#status{height:22px;margin-top:13px;color:var(--muted);font-size:.78rem}
+
+/* HUGE DEVICE */
+
+.device-stage{
+    position:relative;
+    width:min(850px,100%);
+    height:470px;
+    margin:90px auto 0;
+    perspective:1300px;
+}
+.device-glow{
+    position:absolute;
+    left:50%;top:55%;
+    width:450px;height:250px;
+    transform:translate(-50%,-50%);
+    background:#58a6ff18;
+    filter:blur(70px);
+}
+.phone{
+    position:absolute;
+    left:50%;top:50%;
+    width:235px;height:450px;
+    transform:translate(-50%,-50%) rotateX(7deg) rotateY(-15deg) rotateZ(-2deg);
+    border:6px solid #30363d;
+    border-radius:36px;
+    background:#010409;
+    box-shadow:
+        0 70px 100px #00000088,
+        0 0 0 1px #ffffff08,
+        inset 0 0 0 2px #000;
+    transition:transform .2s ease-out;
+    overflow:hidden;
+}
+.phone::before{
+    content:"";
+    position:absolute;
+    top:8px;left:50%;
+    transform:translateX(-50%);
+    width:85px;height:20px;
+    background:#000;
+    border-radius:20px;
+    z-index:5;
+}
+.screen{
+    position:absolute;
+    inset:6px;
+    border-radius:29px;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 60% 25%,#58a6ff66,transparent 25%),
+        radial-gradient(circle at 30% 70%,#bc8cff55,transparent 30%),
+        #0d1117;
+}
+.screen-content{
+    position:absolute;
+    inset:0;
+    padding:50px 20px 20px;
+}
+.screen-time{font-size:2.6rem;font-weight:800;letter-spacing:-.07em}
+.screen-date{color:#8b949e;font-size:.7rem;margin-top:3px}
+.screen-card{
+    margin-top:35px;
+    padding:15px;
+    border:1px solid #ffffff14;
+    border-radius:17px;
+    background:#ffffff0b;
+    backdrop-filter:blur(15px);
+}
+.screen-card small{color:#8b949e}
+.screen-card strong{display:block;margin-top:5px;font-size:1.1rem}
+.screen-pulse{
+    height:5px;
+    margin-top:14px;
+    border-radius:5px;
+    background:linear-gradient(90deg,#58a6ff,#bc8cff,#3fb950);
+    background-size:200% 100%;
+    animation:flow 2.5s linear infinite;
+}
+.floating{
+    position:absolute;
+    padding:13px 16px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:#161b22dd;
+    backdrop-filter:blur(15px);
+    color:#c9d1d9;
+    box-shadow:0 20px 50px #00000055;
+    font-size:.75rem;
+    animation:float 4s ease-in-out infinite;
+}
+.float1{left:10%;top:24%;animation-delay:-1s}
+.float2{right:9%;top:18%;animation-delay:-2s}
+.float3{right:13%;bottom:16%;animation-delay:-3s}
+.float4{left:7%;bottom:20%;animation-delay:-.4s}
+
+/* SECTIONS */
+
+.section{padding:120px 0}
+.section-head{
+    max-width:650px;
+    margin-bottom:48px;
+}
+.section-head.center{text-align:center;margin-left:auto;margin-right:auto}
+.kicker{
+    color:var(--blue);
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-weight:750;
+}
+h2{
+    margin:13px 0;
+    font-size:clamp(2.5rem,6vw,5.3rem);
+    line-height:.9;
+    letter-spacing:-.075em;
+}
+.section-head p{
+    color:var(--muted);
+    line-height:1.7;
+}
+
+/* ANDROID/GITHUB CARDS */
+
+.feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+.feature{
+    min-height:280px;
+    padding:26px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--surface);
+    position:relative;
+    overflow:hidden;
+    transition:
+        transform .6s cubic-bezier(.2,.8,.2,1),
+        border-color .3s,
+        background .3s;
+}
+.feature::after{
+    content:"";
+    position:absolute;
+    width:180px;height:180px;
+    right:-100px;bottom:-100px;
+    border-radius:50%;
+    background:#58a6ff18;
+    filter:blur(20px);
+    transition:.5s;
+}
+.feature:hover{
+    transform:translateY(-12px) scale(1.015);
+    border-color:#58a6ff55;
+    background:#1b222c;
+}
+.feature:hover::after{
+    transform:scale(2);
+}
+.feature-icon{
+    width:45px;height:45px;
+    display:grid;place-items:center;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--surface2);
+    font-size:1.15rem;
+    transition:.5s cubic-bezier(.2,.8,.2,1);
+}
+.feature:hover .feature-icon{
+    transform:rotate(8deg) scale(1.15);
+    border-color:#58a6ff66;
+}
+.feature h3{margin-top:28px;font-size:1.15rem}
+.feature p{margin-top:10px;color:var(--muted);line-height:1.65;font-size:.9rem}
+
+/* BIG SPLIT */
+
+.split{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+.panel{
+    min-height:420px;
+    padding:30px;
+    border:1px solid var(--border);
+    border-radius:22px;
+    background:var(--surface);
+    overflow:hidden;
+}
+.panel h3{font-size:1.45rem;letter-spacing:-.04em}
+.panel>p{margin-top:9px;color:var(--muted);line-height:1.6}
+
+/* TERMINAL */
+
+.terminal{
+    margin-top:35px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:#010409;
+    overflow:hidden;
+    transform:translateY(20px);
+    transition:.8s cubic-bezier(.2,.8,.2,1);
+}
+.panel:hover .terminal{transform:translateY(0)}
+.terminal-bar{
+    display:flex;align-items:center;gap:6px;
+    padding:11px 13px;
+    border-bottom:1px solid #21262d;
+}
+.terminal-bar i{width:8px;height:8px;border-radius:50%;background:#30363d}
+.terminal-code{
+    padding:20px;
+    color:#8b949e;
+    font:12px/2 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+.green{color:#3fb950}
+.blue{color:#58a6ff}
+.white{color:#f0f6fc}
+.purple{color:#bc8cff}
+
+/* INFO LIST */
+
+.info-list{margin-top:32px;display:grid;gap:10px}
+.info{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 16px;
+    border:1px solid transparent;
+    border-radius:12px;
+    background:#ffffff04;
+    transition:.3s;
+}
+.info:hover{
+    background:#ffffff08;
+    border-color:var(--border);
+    transform:translateX(8px);
+}
+.info span:first-child{color:var(--muted)}
+.info span:last-child{font-weight:700}
+
+/* CTA */
+
+.cta{
+    position:relative;
+    text-align:center;
+    padding:110px 25px;
+    border:1px solid var(--border);
+    border-radius:30px;
+    background:
+        radial-gradient(circle at 50% 0,#58a6ff18,transparent 45%),
+        var(--surface);
+    overflow:hidden;
+}
+.cta::before{
+    content:"HZK";
+    position:absolute;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    font-size:22vw;
+    font-weight:900;
+    letter-spacing:-.1em;
+    color:#ffffff03;
+    pointer-events:none;
+}
+.cta-content{position:relative;z-index:2}
+.cta h2{max-width:800px;margin:12px auto}
+.cta p{max-width:550px;margin:18px auto 28px;color:var(--muted);line-height:1.7}
+
+/* FOOTER */
+
+footer{
+    border-top:1px solid var(--border);
+    padding:30px 0;
+    color:var(--muted);
+    font-size:.8rem;
+}
+.footer-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.footer-inner a{text-decoration:none;color:var(--blue)}
+
+/* REVEAL */
+
+.reveal{
+    opacity:0;
+    transform:translateY(70px);
+    transition:opacity .9s ease,transform 1s cubic-bezier(.2,.8,.2,1);
+}
+.reveal.visible{opacity:1;transform:none}
+
+@keyframes gradient{
+    to{background-position:200% center}
+}
+@keyframes flow{
+    to{background-position:200% 0}
+}
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-15px)}
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+    .nav-links a:not(.github){display:none}
+    .hero{padding-top:70px}
+    .device-stage{height:430px;transform:scale(.9)}
+    .feature-grid,.split{grid-template-columns:1fr}
+    .section{padding:85px 0}
+    .float1{left:0}.float2{right:0}
+    .float3{right:2%}.float4{left:0}
+}
+@media(max-width:520px){
+    .container{width:93%}
+    h1{font-size:20vw}
+    .hero-copy{font-size:.94rem}
+    .actions{flex-direction:column}
+    .btn{width:100%}
+    .device-stage{height:380px;transform:scale(.72);margin-top:45px}
+    .section{padding:70px 0}
+    .panel{padding:23px}
+    .cta{padding:75px 20px}
+    .footer-inner{flex-direction:column;gap:12px;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+        animation:none!important;
+        transition:none!important;
+        scroll-behavior:auto!important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+
+<nav id="nav">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;width:min(1120px,92%);margin:auto">
+        <a class="brand" href="#">
+            <div class="brand-mark">H</div>
+            HZK Mobile Info
+        </a>
+
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#inside">Inside</a>
+            <a class="github"
+               href="https://github.com/hazik-mir/HZK-Mobile-Info"
+               target="_blank"
+               rel="noopener noreferrer">GitHub ↗</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Open source · Built by hazik-mir
+        </div>
+
+        <h1 class="hero-title">
+            Know your<br>
+            <span>device.</span>
+        </h1>
+
+        <p class="hero-copy">
+            A simple Android utility that puts the important information
+            about your phone in one place. Fast, readable and built without
+            unnecessary clutter.
+        </p>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="download">↓ Download latest</button>
+            <a class="btn btn-secondary" href="#features">Explore HZK ↓</a>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="device-stage" id="deviceStage">
+
+            <div class="device-glow"></div>
+
+            <div class="floating float1">⚡ Fast detection</div>
+            <div class="floating float2">◈ Snapdragon 865</div>
+            <div class="floating float3">12 GB RAM</div>
+            <div class="floating float4">Android 13</div>
+
+            <div class="phone" id="phone">
+
+                <div class="screen">
+
+                    <div class="screen-content">
+
+                        <div class="screen-time">12:42</div>
+                        <div class="screen-date">Wednesday · August 19</div>
+
+                        <div class="screen-card">
+                            <small>Device</small>
+                            <strong>OnePlus 8</strong>
+
+                            <div class="screen-pulse"></div>
+                        </div>
+
+                        <div class="screen-card">
+                            <small>Processor</small>
+                            <strong>Snapdragon 865</strong>
+                        </div>
+
+                        <div class="screen-card">
+                            <small>Memory</small>
+                            <strong>12 GB RAM</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section reveal" id="features">
+
+    <div class="container">
+
+        <div class="section-head center">
+            <div class="kicker">Designed for Android</div>
+            <h2>Simple by design.</h2>
+            <p>
+                HZK doesn't need a complicated dashboard.
+                The useful information should be obvious the moment
+                you open the app.
+            </p>
+        </div>
+
+        <div class="feature-grid">
+
+            <article class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant information</h3>
+                <p>See the important specifications without digging through Android settings.</p>
+            </article>
+
+            <article class="feature">
+                <div class="feature-icon">◈</div>
+                <h3>Hardware details</h3>
+                <p>CPU, RAM, storage, Android version and other useful device information.</p>
+            </article>
+
+            <article class="feature">
+                <div class="feature-icon">⌁</div>
+                <h3>Clean interface</h3>
+                <p>A focused UI inspired by modern Android system interfaces.</p>
+            </article>
+
+            <article class="feature">
+                <div class="feature-icon">◇</div>
+                <h3>Lightweight</h3>
+                <p>Device information shouldn't require a huge application running in the background.</p>
+            </article>
+
+            <article class="feature">
+                <div class="feature-icon">⌘</div>
+                <h3>Developer friendly</h3>
+                <p>Useful information for developers, testers and people who actually care about hardware.</p>
+            </article>
+
+            <article class="feature">
+                <div class="feature-icon">↗</div>
+                <h3>Open source</h3>
+                <p>Inspect the source, follow development and contribute on GitHub.</p>
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section reveal" id="inside">
+
+    <div class="container">
+
+        <div class="section-head">
+            <div class="kicker">Under the hood</div>
+            <h2>See what your phone actually is.</h2>
+            <p>
+                Technical information doesn't have to look technical.
+                HZK keeps it readable while still exposing useful details.
+            </p>
+        </div>
+
+        <div class="split">
+
+            <div class="panel">
+
+                <h3>Developer view</h3>
+
+                <p>
+                    The kind of information HZK can surface from an Android device.
+                </p>
+
+                <div class="terminal">
+
+                    <div class="terminal-bar">
+                        <i></i><i></i><i></i>
+                    </div>
+
+                    <div class="terminal-code">
+                        <div><span class="green">$</span> hzk <span class="blue">device</span></div>
+                        <div><span class="white">Device</span> = OnePlus 8</div>
+                        <div><span class="white">SoC</span> = Snapdragon 865</div>
+                        <div><span class="white">RAM</span> = 12 GB</div>
+                        <div><span class="white">Storage</span> = 256 GB</div>
+                        <div><span class="white">Android</span> = 13</div>
+                        <div><span class="white">Architecture</span> = arm64-v8a</div>
+                        <div><span class="purple">Status</span> = Ready</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <h3>Information at a glance</h3>
+
+                <div class="info-list">
+
+                    <div class="info">
+                        <span>Processor</span>
+                        <span>Snapdragon 865</span>
+                    </div>
+
+                    <div class="info">
+                        <span>Memory</span>
+                        <span>12 GB</span>
+                    </div>
+
+                    <div class="info">
+                        <span>Storage</span>
+                        <span>256 GB</span>
+                    </div>
+
+                    <div class="info">
+                        <span>Android</span>
+                        <span>13</span>
+                    </div>
+
+                    <div class="info">
+                        <span>Architecture</span>
+                        <span>arm64</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section reveal">
+
+    <div class="container">
+
+        <div class="cta">
+
+            <div class="cta-content">
+
+                <div class="kicker">HZK Mobile Info</div>
+
+                <h2>Know your device.<br>Don't guess.</h2>
+
+                <p>
+                    Get the latest release directly from the project's
+                    GitHub repository.
+                </p>
+
+                <button class="btn btn-primary" id="download2">
+                    ↓ Download latest release
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+    <div class="container footer-inner">
+        <div>HZK Mobile Info · crafted by <b>hazik-mir</b></div>
+
+        <a href="https://github.com/hazik-mir/HZK-Mobile-Info"
+           target="_blank"
+           rel="noopener noreferrer">
+            View source ↗
+        </a>
+    </div>
+
+</footer>
+
+
+<script>
+
+/* NAV SCROLL */
+
+const nav = document.getElementById("nav");
+
+window.addEventListener("scroll",()=>{
+    nav.classList.toggle("scrolled",window.scrollY > 20);
+},{passive:true});
+
+
+/* PHONE PARALLAX */
+
+const stage = document.getElementById("deviceStage");
+const phone = document.getElementById("phone");
+
+if(window.matchMedia("(pointer:fine)").matches){
+
+    stage.addEventListener("pointermove",(e)=>{
+
+        const rect = stage.getBoundingClientRect();
+
+        const x = (e.clientX - rect.left) / rect.width - .5;
+        const y = (e.clientY - rect.top) / rect.height - .5;
+
+        phone.style.transform =
+            `translate(-50%,-50%)
+             rotateX(${7 - y * 14}deg)
+             rotateY(${-15 + x * 20}deg)
+             rotateZ(${-2 + x * 3}deg)`;
+
+    });
+
+    stage.addEventListener("pointerleave",()=>{
+        phone.style.transform =
+            "translate(-50%,-50%) rotateX(7deg) rotateY(-15deg) rotateZ(-2deg)";
+    });
+}
+
+
+/* SCROLL REVEAL */
+
+const observer = new IntersectionObserver(
+    entries=>{
+        entries.forEach(entry=>{
+            if(entry.isIntersecting){
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    },
+    {threshold:.12}
+);
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(el=>observer.observe(el));
+
+
+/* DOWNLOAD */
+
+const buttons = [
+    document.getElementById("download"),
+    document.getElementById("download2")
+];
+
+const status = document.getElementById("status");
+
+async function downloadLatest(){
+
+    buttons.forEach(button=>{
+        button.disabled = true;
+        button.textContent = "Finding latest release…";
+    });
+
+    status.textContent = "";
+
+    try{
+
+        const response = await fetch(
+            "https://api.github.com/repos/hazik-mir/HZK-Mobile-Info/releases/latest",
+            {
+                headers:{
+                    Accept:"application/vnd.github+json"
+                }
+            }
+        );
+
+        if(!response.ok)
+            throw new Error("GitHub request failed");
+
+        const release = await response.json();
+
+        const asset =
+            release.assets?.find(
+                asset => asset.name.toLowerCase().endsWith(".apk")
+            ) ||
+            release.assets?.find(
+                asset => asset.browser_download_url
+            );
+
+        if(!asset)
+            throw new Error("No downloadable release asset");
+
+        const link = document.createElement("a");
+
+        link.href = asset.browser_download_url;
+        link.download = asset.name;
+        link.rel = "noopener";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        buttons.forEach(button=>{
+            button.textContent = "✓ Download started";
+        });
+
+        status.textContent = `${asset.name} is downloading.`;
+
+    }catch(error){
+
+        console.error(error);
+
+        buttons.forEach(button=>{
+            button.textContent = "Try again";
+        });
+
+        status.textContent =
+            "Couldn't find the latest release. Check GitHub or your connection.";
+
+    }finally{
+
+        buttons.forEach(button=>{
+            button.disabled = false;
+        });
+
+    }
+}
+
+buttons.forEach(button=>{
+    button.addEventListener("click",downloadLatest);
+});
+
+</script>
+
+</body>
+</html>
